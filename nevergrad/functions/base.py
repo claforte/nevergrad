@@ -69,7 +69,7 @@ class BaseFunction(abc.ABC):
         return dict(self._descriptors)  # Avoid external modification
 
     def transform(self, x: np.ndarray) -> np.ndarray:
-        """Transform the input to another function specific domain.
+        """Transform the input to another function-specific domain.
         """
         if self._transform is not None:
             x = self._TRANSFORMS[self._transform](self, x)

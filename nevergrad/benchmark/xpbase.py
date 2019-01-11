@@ -134,7 +134,7 @@ class Experiment:
             raise RuntimeError(f"Too much elapsed budget {num_calls} for {optim_name} on {self.function}")
 
     def _run_with_error(self, callbacks: Optional[Dict[str, base._OptimCallBack]] = None) -> None:
-        """Run an experiment with the provided artificial function and optimizer
+        """Run an experiment with the specified function and optimizer
 
         Parameter
         ---------

@@ -138,7 +138,7 @@ class FinishedJob:
 
 
 class SequentialExecutor:
-    """Executor which run sequentially and locally
+    """Executor which runs sequentially and locally
     (just calls the function and returns a FinishedJob)
     """
 
