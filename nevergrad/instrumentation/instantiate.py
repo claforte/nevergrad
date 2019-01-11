@@ -176,7 +176,7 @@ class InstrumentedFunction(base.BaseFunction):
     function: callable
         the callable to convert
     *args, **kwargs: Any
-        Any argument. Arguments of type variables.SoftmaxCategorical or variabls.Gaussian will be instrumented
+        Any argument. Arguments of type variables.SoftmaxCategorical or variables.Gaussian will be instrumented
         and others will be kept constant.
 
     Note
@@ -191,13 +191,14 @@ class InstrumentedFunction(base.BaseFunction):
     def __init__(self, function: Callable, *args: Any, **kwargs: Any) -> None:
         assert callable(function)
         self._args = [variables._Constant.convert_non_token(x) for x in args]
-        self._kwargs = OrderedDict(sorted((x, variables._Constant.convert_non_token(y)) for x, y in kwargs.items()))  # make deteriministic
+        self._kwargs = OrderedDict(sorted((x, variables._Constant.convert_non_token(y)) for x, y in kwargs.items()))  # make deterministic
         dim = sum(x.dimension for x in self._args + list(self._kwargs.values()))
         super().__init__(dimension=dim)
         # keep track of what is instrumented (but "how" is probably too long/complex)
         instrumented = [f"arg{k}" for k, var in enumerate(self._args) if not isinstance(var, variables._Constant)]
         instrumented += sorted([x for x, y in self._kwargs.items() if not isinstance(y, variables._Constant)])
         self._descriptors.update(name=function.__name__, instrumented=",".join(instrumented))
+
         self._function = function
         self.last_call_args: Optional[Tuple[Any, ...]] = None
         self.last_call_kwargs: Optional[Dict[str, Any]] = None
