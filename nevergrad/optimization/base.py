@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import abc
+import random
 import time
 import warnings
 from typing import Optional, Tuple, Callable, Any, Dict, List, Union
@@ -46,6 +47,9 @@ class Optimizer(abc.ABC):  # pylint: disable=too-many-instance-attributes
         number of allowed evaluations
     num_workers: int
         number of evaluations which will be run in parallel at once
+    seed: int/None
+        random seed to pass to underlying optimizer (e.g. CMA-ES). If not None, sets
+            np.random.seed() and random.seed().
     """
     # pylint: disable=too-many-locals
 
@@ -55,7 +59,7 @@ class Optimizer(abc.ABC):  # pylint: disable=too-many-instance-attributes
     no_parallelization = False  # algorithm which is designed to run sequentially only
     hashed = False
 
-    def __init__(self, dimension: int, budget: Optional[int] = None, num_workers: int = 1) -> None:
+    def __init__(self, dimension: int, budget: Optional[int] = None, num_workers: int = 1, seed=None) -> None:
         if self.no_parallelization and num_workers > 1:
             raise ValueError(f"{self.__class__.__name__} does not support parallelization")
         self.num_workers = int(num_workers)
@@ -63,6 +67,12 @@ class Optimizer(abc.ABC):  # pylint: disable=too-many-instance-attributes
         np.testing.assert_equal(dimension, int(dimension), f"Dimension must be an int")
         self.dimension = int(dimension)
         dimension = int(dimension)
+
+        self.seed = seed
+        if seed:
+            np.random.seed(seed)
+            random.seed(seed)
+
         # keep a record of evaluations, and current bests which are updated at each new evaluation
         self.archive: Dict[Tuple[float, ...], utils.Value] = {}
         self.current_bests = {x: utils.Point(tuple(0. for _ in range(dimension)), utils.Value(np.inf))
