@@ -50,6 +50,9 @@ class Optimizer(abc.ABC):  # pylint: disable=too-many-instance-attributes
     seed: int/None
         random seed to pass to underlying optimizer (e.g. CMA-ES). If not None, sets
             np.random.seed() and random.seed().
+    verbosity: int/None
+        default verbosity level to pass, e.g. to CMA optimizer. -1 should is very quiet (don't print initial dimensions).
+        NOTE: doens't impact the verbosity passed to optimize().
     """
     # pylint: disable=too-many-locals
 
@@ -59,7 +62,7 @@ class Optimizer(abc.ABC):  # pylint: disable=too-many-instance-attributes
     no_parallelization = False  # algorithm which is designed to run sequentially only
     hashed = False
 
-    def __init__(self, dimension: int, budget: Optional[int] = None, num_workers: int = 1, seed=None) -> None:
+    def __init__(self, dimension: int, budget: Optional[int] = None, num_workers: int = 1, seed=None, verbosity=None) -> None:
         if self.no_parallelization and num_workers > 1:
             raise ValueError(f"{self.__class__.__name__} does not support parallelization")
         self.num_workers = int(num_workers)
@@ -72,6 +75,8 @@ class Optimizer(abc.ABC):  # pylint: disable=too-many-instance-attributes
         if seed:
             np.random.seed(seed)
             random.seed(seed)
+
+        self.verbosity=verbosity
 
         # keep a record of evaluations, and current bests which are updated at each new evaluation
         self.archive: Dict[Tuple[float, ...], utils.Value] = {}

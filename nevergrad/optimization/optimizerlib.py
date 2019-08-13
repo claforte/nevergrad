@@ -111,6 +111,8 @@ class CMA(base.Optimizer):
     def __init__(self, dimension: int, budget: Optional[int] = None, num_workers: int = 1, **kwargs) -> None:
         super().__init__(dimension, budget=budget, num_workers=num_workers, **kwargs)
         cma_opts = {}
+        if self.verbosity is not None:
+            cma_opts['verbose'] = self.verbosity
         if self.seed is not None:
             cma_opts['seed'] = self.seed
         self.es = cma.CMAEvolutionStrategy([0.] * dimension, 1.0, cma_opts)
